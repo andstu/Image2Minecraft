@@ -5,7 +5,7 @@ import numpy as np
 import pickle
 
 
-def generate_in_world(world_name, saves_folder, npy_voxels, block_types=Material.gold_block, offset_pos=(5, 5, 5)):
+def generate_in_world(world_name, saves_folder, npy_voxels, block_types=Material.gold_block, offset_pos=(-50, 5, -50)):
     with World(world_name, save_location=saves_folder, debug=False) as wrld:
         if isinstance(block_types, str):
             with open(block_types, 'rb') as f:
@@ -20,18 +20,21 @@ def generate_in_world(world_name, saves_folder, npy_voxels, block_types=Material
             raise TypeError("npy_voxels is not set to a usable type.")
 #         obj = obj.squeeze(0)
         voxels = np.argwhere(obj == 1)
-        voxels[:, [1, 2]] = voxels[:, [2, 1]]
+#         voxels[:, [1, 2]] = voxels[:, [2, 1]]
         
         for voxel in voxels:
-            print('minecraft:' + block_types[tuple(voxel[[0,2, 1]])][:-4])
-            wrld.get_block(list(voxel + offset_pos)).set_state(BlockState('minecraft:' + block_types[tuple(voxel[[0,2, 1]])][:-4]))
-#             wrld.get_block(list(voxel + offset_pos)).set_state(BlockState('minecraft:gold_block'))
+#             print('minecraft:' + block_types[tuple(voxel[[0,2, 1]])][:-4])
+#             wrld.get_block(list(voxel + offset_pos)).set_state(BlockState('minecraft:' + block_types[tuple(voxel[[0,2, 1]])][:-4]))
+            wrld.get_block(list(voxel + offset_pos)).set_state(BlockState('minecraft:' + block_types[tuple(voxel)][:-4]))
+            
+            test = 'wet_sponge.png'
+#             wrld.get_block(list(voxel + offset_pos)).set_state(BlockState('minecraft:' + test[:-4]))
 
 
     print("Done!")
         
 
-generate_in_world("Flat", r'C:\Users\atlig\AppData\Roaming\.minecraft\saves', 'Material_Extraction/cube_world.npy', block_types='Material_Extraction/voxel_to_block')
+generate_in_world("Flat", r'C:\Users\atlig\AppData\Roaming\.minecraft\saves', 'Material_Extraction/objs/cub/results/cube_world_mesh_0.npy', block_types='Material_Extraction/objs/cub/results/voxel_to_block_mesh_0')
 
 
 # with World('Flat', save_location='C:/Users/gsmel/AppData/Roaming/.minecraft/saves', debug=True) as wrld:
