@@ -249,12 +249,22 @@ def main(path_to_data, file_name, block_path, resolution, metric, filter_list=[]
     metric_helper = VoxelMetric(image, minecraft_texture_data, metric)
     voxel_to_block = Get_Voxel_Textures(image, obj, voxel_to_faces, metric_helper)
 
+    # Creates Cube Mesh
+    print("Creating Cube Mesh")
+    c_v, c_f = voxelgrids_to_cubic_meshes(torch.from_numpy(cube_world).unsqueeze(dim=0))
+
     # Saves Data
     with open(f"{path_to_data}/results/voxel_to_block_{file_name}", "wb") as f:
         pickle.dump(voxel_to_block, f)
 
     with open(f'{path_to_data}/results/cube_world_{file_name}.npy', 'wb') as f:
         np.save(f, cube_world)
+
+    with open(f'{path_to_data}/results/cube_world_{file_name}_v.npy', 'wb') as f:
+        np.save(f, c_v[0].cpu().numpy())
+
+    with open(f'{path_to_data}/results/cube_world_{file_name}_f.npy', 'wb') as f:
+        np.save(f, c_f[0].cpu().numpy())
     
 
 # Arguments
