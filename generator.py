@@ -93,7 +93,7 @@ def Get_Voxel_Data(obj, resolution):
     return np.array(voxel), voxel_to_faces
 
 # Takes in Dense Triggered Voxel List, Creates Sparse Cube World
-def Generate_Cube_World(voxel):
+def Generate_Cube_World(voxel, resolution):
     cube_world = np.zeros((resolution,resolution,resolution))
     cube_world[voxel[:,0],voxel[:,1], voxel[:,2]] = 1
     return cube_world
@@ -232,7 +232,7 @@ def Get_Voxel_Textures(image, obj, voxel_to_faces, metric_helper):
 
     return voxel_to_block
 
-def main(path_to_data, file_name, block_path, resolution, metric, filter_list=[]):
+def generate(path_to_data, file_name, block_path, resolution, metric, filter_list=[]):
     # Gets Raw OBJ DAta
     print("Getting OBJ")
     obj = Get_OBJ_Data(path_to_data, file_name)
@@ -241,7 +241,7 @@ def main(path_to_data, file_name, block_path, resolution, metric, filter_list=[]
     # Gets Voxel Data
     print("Getting Voxel Data")
     voxel, voxel_to_faces = Get_Voxel_Data(obj, resolution)
-    cube_world = Generate_Cube_World(voxel)
+    cube_world = Generate_Cube_World(voxel, resolution)
     
     # Gets Minecraft Data
     print("Getting Minecraft Data")
@@ -270,16 +270,16 @@ def main(path_to_data, file_name, block_path, resolution, metric, filter_list=[]
         np.save(f, c_f[0].cpu().numpy())
     
 
-# Arguments
-dataset = "p3d"
-path_to_data = f"objs/{dataset}/"
-file_name = 'mesh_0' # Assumes mtl and png have the same name
-block_path = "../MinecraftTextures/block/"
-resolution = 50
-metric = "w_eucl"
-# filter_list = []
+# # Arguments
+# dataset = "p3d"
+# path_to_data = f"objs/{dataset}/"
+# file_name = 'mesh_0' # Assumes mtl and png have the same name
+# block_path = "../MinecraftTextures/block/"
+# resolution = 50
+# metric = "w_eucl"
+# # filter_list = []
 
-main(path_to_data, file_name, block_path, resolution, metric)
+# main(path_to_data, file_name, block_path, resolution, metric)
 
 
 
