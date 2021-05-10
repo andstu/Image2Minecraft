@@ -37,7 +37,11 @@ def generate_in_world(world_name, saves_folder, npy_voxels, block_types=Material
 # save_path = r'C:\Users\atlig\AppData\Roaming\.minecraft\saves'
 save_path = r'/home/mfclinton/.minecraft/saves'
 
-generate_in_world("Flat", save_path, 'Material_Extraction/objs/cub/results/cube_world_mesh_0.npy', block_types='Material_Extraction/objs/cub/results/voxel_to_block_mesh_0')
+dataset = "p3d"
+path_to_data = f"objs/{dataset}/"
+file_name = 'mesh_0' # Assumes mtl and png have the same name
+offset_pos=(450, 5, 450)
+generate_in_world("Flat", save_path, f'Material_Extraction/{path_to_data}results/cube_world_{file_name}.npy', block_types=f'Material_Extraction/{path_to_data}results/voxel_to_block_{file_name}',offset_pos=offset_pos)
 
 
 # with World('Flat', save_location='C:/Users/gsmel/AppData/Roaming/.minecraft/saves', debug=True) as wrld:

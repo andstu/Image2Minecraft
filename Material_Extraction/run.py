@@ -190,7 +190,7 @@ class VoxelMetric:
             # Divided by 255 to prevent overflow
             sqred_difference = ((sub_image - resized_img)/255)**2
 
-            dist = np.sum(np.sqrt(sqred_difference * weights))
+            dist = np.sqrt(np.sum(sqred_difference * weights))
 
             dists.append(dist)
         
@@ -198,7 +198,7 @@ class VoxelMetric:
         b_id = np.argmin(dists)
         return b_id
 
-# Masks the Image to Only Get textures for Triangles within voxel "voxel_key"
+# Masks the Image to Only Get textures for Triangles within voxel "voxel_key"location
 def Get_Masked_Values(image, obj, voxel_key, face_indexes):
     mask = np.zeros(image.shape, dtype=np.uint8)
     
@@ -206,7 +206,10 @@ def Get_Masked_Values(image, obj, voxel_key, face_indexes):
         ft = obj["ft"][f_idx]
         
         # Gets UV Coordinates of Respective Face
-        uv_coords = np.rint(obj["vt"][ft - 1] * image.shape[0]).astype(int)
+        vt = obj["vt"][ft - 1]
+        vt[:,1] = 1 - vt[:,1]# fix coordinate system
+        # print(vt)
+        uv_coords = np.rint(vt * image.shape[0]).astype(int)
         uv_coords = uv_coords.reshape((-1,1,2))
 
         # Fills in mask for the respective Face_Texture
@@ -268,11 +271,12 @@ def main(path_to_data, file_name, block_path, resolution, metric, filter_list=[]
     
 
 # Arguments
-path_to_data = "objs/cub/"
+dataset = "p3d"
+path_to_data = f"objs/{dataset}/"
 file_name = 'mesh_0' # Assumes mtl and png have the same name
 block_path = "../MinecraftTextures/block/"
 resolution = 50
-metric = "eucl"
+metric = "w_eucl"
 # filter_list = []
 
 main(path_to_data, file_name, block_path, resolution, metric)
