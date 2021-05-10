@@ -187,10 +187,11 @@ class VoxelMetric:
             # Resizes Block Image to be Size of Texture
             resized_img = cv2.resize(block_img, (sub_image.shape[1], sub_image.shape[0]), interpolation = cv2.INTER_AREA)
             
-            sqred_difference = (sub_image - resized_img)**2
-            
+            # Divided by 255 to prevent overflow
+            sqred_difference = ((sub_image - resized_img)/255)**2
 
-            dist = np.sum(np.sqrt(sqred_difference))
+            dist = np.sum(np.sqrt(sqred_difference * weights))
+
             dists.append(dist)
         
         # Gets Closest Block ID
@@ -260,7 +261,7 @@ def main(path_to_data, file_name, block_path, resolution, metric, filter_list=[]
 path_to_data = "objs/cub/"
 file_name = 'mesh_0' # Assumes mtl and png have the same name
 block_path = "../MinecraftTextures/block/"
-resolution = 50
+resolution = 5
 metric = "w_eucl"
 # filter_list = []
 
