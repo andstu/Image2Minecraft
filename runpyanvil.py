@@ -13,7 +13,7 @@ def clear(world_name, saves_folder):
 
 def generate_in_world(world_name, saves_folder, npy_voxels, block_types=Material.gold_block, offset_pos=(-50, 5, -50)):
     with World(world_name, save_location=saves_folder, debug=True) as wrld:
-        if isinstance(block_types, str) and block_types[-6:] == 'pickle':
+        if isinstance(block_types, str): # and block_types[-6:] == 'pickle':
             with open(block_types, 'rb') as f:
                 block_types = pickle.load(f)
             block_type_from_file = True
@@ -41,10 +41,10 @@ def generate_in_world(world_name, saves_folder, npy_voxels, block_types=Material
         
 
 # generate_in_world("Flat", r'C:\Users\atlig\AppData\Roaming\.minecraft\saves', 'Material_Extraction/objs/cub/results/cube_world_mesh_0.npy', block_types='Material_Extraction/objs/cub/results/voxel_to_block_mesh_0.pickle')
-wname = "Flat"
-saves = 'C:/Users/gsmel/AppData/Roaming/.minecraft/saves'
+# wname = "Flat"
+# saves = 'C:/Users/gsmel/AppData/Roaming/.minecraft/saves'
 # clear(wname, saves)
-generate_in_world(wname, saves, 'Material_Extraction/objs/cub/results/cube_world_mesh_0.npy', block_types='Material_Extraction/objs/cub/results/voxel_to_block_mesh_0.pickle')
+# generate_in_world(wname, saves, 'Material_Extraction/objs/cub/results/cube_world_mesh_0.npy', block_types='Material_Extraction/objs/cub/results/voxel_to_block_mesh_0.pickle')
 # save_path = r'C:\Users\atlig\AppData\Roaming\.minecraft\saves'
 # save_path = r'/home/mfclinton/.minecraft/saves'
 
