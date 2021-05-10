@@ -261,7 +261,7 @@ def main(path_to_data, file_name, block_path, resolution, metric, filter_list=[]
 path_to_data = "objs/cub/"
 file_name = 'mesh_0' # Assumes mtl and png have the same name
 block_path = "../MinecraftTextures/block/"
-resolution = 5
+resolution = 50
 metric = "w_eucl"
 # filter_list = []
 
