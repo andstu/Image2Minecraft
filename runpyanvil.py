@@ -5,11 +5,21 @@ import numpy as np
 import pickle
 
 
+def clear(world_name, saves_folder):
+    with World(world_name, save_location=saves_folder) as wrld:
+        cv = wrld.get_canvas()
+        cv.select_rectangle((-100, 5, -100), (100, 47, 100)).fill(BlockState(Material.air))
+    print("Cleared!")
+
 def generate_in_world(world_name, saves_folder, npy_voxels, block_types=Material.gold_block, offset_pos=(-50, 5, -50)):
-    with World(world_name, save_location=saves_folder, debug=False) as wrld:
-        if isinstance(block_types, str):
+    with World(world_name, save_location=saves_folder, debug=True) as wrld:
+        if isinstance(block_types, str) and block_types[-6:] == 'pickle':
             with open(block_types, 'rb') as f:
                 block_types = pickle.load(f)
+            block_type_from_file = True
+        else:
+            block_type = block_types
+            block_type_from_file = False
         
         
         if isinstance(npy_voxels, str) and npy_voxels[-4:] == '.npy':
@@ -20,21 +30,29 @@ def generate_in_world(world_name, saves_folder, npy_voxels, block_types=Material
             raise TypeError("npy_voxels is not set to a usable type.")
 #         obj = obj.squeeze(0)
         voxels = np.argwhere(obj == 1)
-#         voxels[:, [1, 2]] = voxels[:, [2, 1]]
+        # voxels[:, [1, 2]] = voxels[:, [2, 1]]
         
         for voxel in voxels:
-#             print('minecraft:' + block_types[tuple(voxel[[0,2, 1]])][:-4])
-#             wrld.get_block(list(voxel + offset_pos)).set_state(BlockState('minecraft:' + block_types[tuple(voxel[[0,2, 1]])][:-4]))
-            wrld.get_block(list(voxel + offset_pos)).set_state(BlockState('minecraft:' + block_types[tuple(voxel)][:-4]))
+            if block_type_from_file:
+                block_type = 'minecraft:' + block_types[tuple(voxel)][:-4]
+            wrld.get_block(list(voxel + offset_pos)).set_state(BlockState(block_type))
             
-            test = 'wet_sponge.png'
-#             wrld.get_block(list(voxel + offset_pos)).set_state(BlockState('minecraft:' + test[:-4]))
-
-
     print("Done!")
         
 
-generate_in_world("Flat", r'C:\Users\atlig\AppData\Roaming\.minecraft\saves', 'Material_Extraction/objs/cub/results/cube_world_mesh_0.npy', block_types='Material_Extraction/objs/cub/results/voxel_to_block_mesh_0')
+# generate_in_world("Flat", r'C:\Users\atlig\AppData\Roaming\.minecraft\saves', 'Material_Extraction/objs/cub/results/cube_world_mesh_0.npy', block_types='Material_Extraction/objs/cub/results/voxel_to_block_mesh_0.pickle')
+wname = "Flat"
+saves = 'C:/Users/gsmel/AppData/Roaming/.minecraft/saves'
+# clear(wname, saves)
+generate_in_world(wname, saves, 'Material_Extraction/objs/cub/results/cube_world_mesh_0.npy', block_types='Material_Extraction/objs/cub/results/voxel_to_block_mesh_0.pickle')
+# save_path = r'C:\Users\atlig\AppData\Roaming\.minecraft\saves'
+# save_path = r'/home/mfclinton/.minecraft/saves'
+
+# dataset = "p3d"
+# path_to_data = f"objs/{dataset}/"
+# file_name = 'mesh_0' # Assumes mtl and png have the same name
+# offset_pos=(450, 5, 450)
+# generate_in_world("Flat", save_path, f'Material_Extraction/{path_to_data}results/cube_world_{file_name}.npy', block_types=f'Material_Extraction/{path_to_data}results/voxel_to_block_{file_name}',offset_pos=offset_pos)
 
 
 # with World('Flat', save_location='C:/Users/gsmel/AppData/Roaming/.minecraft/saves', debug=True) as wrld:
