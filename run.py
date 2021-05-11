@@ -25,7 +25,7 @@ if __name__=="__main__":
     resolution = 50
     metric = "w_eucl"
     filter_list = Create_Filter_List(block_path)
-    world_name = "World_2"
+    world_name = "JoeMama"
 
     # Minecraft Params
     save_path = r'/home/mfclinton/.minecraft/saves'
@@ -36,4 +36,4 @@ if __name__=="__main__":
     generate(path_to_data, file_name, block_path, resolution, metric, filter_list=filter_list)
     
     # Creates Minecraft Save 
-    # generate_in_world(world_name, save_path, f'{path_to_data}results/cube_world_{file_name}.npy', block_types=f'{path_to_data}results/voxel_to_block_{file_name}',offset_pos=offset_pos)
+    generate_in_world(world_name, save_path, f'{path_to_data}results/cube_world_{file_name}.npy', block_types=f'{path_to_data}results/voxel_to_block_{file_name}',offset_pos=offset_pos)
