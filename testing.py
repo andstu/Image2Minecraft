@@ -5,17 +5,22 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from scipy.linalg import norm
 import glob
-
+from generator import generate
+from texturing import texture_cube_mesh
+import os
 
 def compare_images(file_name, img_dir='results/'):
 
     norms = []
 
+    # print(f'{img_dir}*{file_name}.png')
+
     for f in glob.glob(f'{img_dir}*{file_name}.png'):
         theta = f[len(img_dir):-(len(file_name) + 5)]
         x = np.asarray(Image.open(f))
         y = np.asarray(Image.open(f'{img_dir}{theta}_{file_name}_cube_textured.png'))
-        norms.append(norm(x - y))
+        n = norm(x - y, axis=2)
+        norms.append(n.mean())
 
     return np.mean(norms)
 
@@ -43,7 +48,7 @@ def compute_IOU(path_to_data, file_name):
     return i/u
 
 
-def render_mesh(path_to_data, file_name, output_dir='results/'):
+def render_mesh(path_to_data, file_name, dataset, output_dir='results/'):
 
     mesh_file = f"{path_to_data}{file_name}.obj"
 
@@ -126,13 +131,85 @@ def render_mesh(path_to_data, file_name, output_dir='results/'):
         plt.axis('off')
         plt.imshow(color)
 
-        plt.savefig(f'{output_dir}{theta_deg}_{file_name}.png')
+        plt.savefig(f'{output_dir}{dataset}/{theta_deg}_{file_name}.png')
+
+    
+def Create_Filter_List(block_path):
+    filter_list = []
+    for file in os.listdir(block_path):
+        if not file.endswith(".png"):
+            continue
+        
+        block = file.replace(".png", "")
+
+        if block.endswith("powder") or block.endswith("leaves") or block == "ladder" or block == "ice" or block.endswith("glass") or block == "snow":
+            filter_list.append(file)
+
+    return filter_list
+        
+
+if __name__=="__main__":
+    print(len(glob.glob('objs/cub/*.obj')))
+    print(len(glob.glob('objs/p3d/*.obj')))
+    resolution = 50
+
+    block_path = "MinecraftTextures/block/"
+    resolution = 50
+    metric = "w_eucl"
+    filter_list = Create_Filter_List(block_path)
+
+    bigger_iou = []
+    bigger_dist = []
+
+    for dataset in ['p3d', 'cub']:
+        iou_list = []
+        dist_list = []
+
+        path_to_data = f'objs/{dataset}/'
+        for fn in glob.glob(f'objs/{dataset}/*.obj'):
+            file_name = fn[len('objs/p3d/'):-4]
+            print(f'------{dataset}/{file_name}------')
+            # Generates Cube_World and Texture Mappings
+            print("Extracting Mesh Data")
+            generate(path_to_data, file_name, block_path, resolution, metric, filter_list=filter_list)
+
+            # Creates the Cube Mesh
+            print("Creating Cube Mesh")
+            texture_cube_mesh(path_to_data, file_name)
+
+            cube_file = f'objs/{dataset}/results/{file_name}_cube_textured'
+
+            print("Rendering Meshes")
+            render_mesh(path_to_data, file_name, dataset)
+            render_mesh(path_to_data, cube_file, dataset)
+
+            print("Measuring IOU")
+            iou = compute_IOU(path_to_data, file_name)
+
+            print("Comparing Images")
+            dist = compare_images(file_name, img_dir=f'results/{dataset}/')
+
+            print(f'IOU: {iou}')
+            print(f'Dist: {dist}')
+
+            iou_list.append(iou)
+            dist_list.append(dist)
+
+        bigger_dist.append(np.mean(dist_list))
+        bigger_iou.append(np.mean(iou_list))
 
 
-# path_to_data = "objs/p3d/results/"
-# file_name = "mesh_1"
-# print(compute_IOU(path_to_data, file_name))
-# render_mesh(path_to_data, file_name)
-# print(compare_images(file_name))
+    print(f'Avg IOU for p3d: {bigger_iou[0]}')
+    print(f'Avg dist for p3d: {bigger_dist[0]}')
+    print(f'Avg IOU for cub: {bigger_iou[1]}')
+    print(f'Avg dist for cub: {bigger_dist[1]}')
+
+
+
+    # path_to_data = "objs/p3d/"
+    # file_name = "mesh_1"
+    # print(compute_IOU(path_to_data, file_name))
+    # render_mesh(path_to_data, file_name, 'p3d')
+    # print(compare_images(file_name, img_dir='results/p3d'))
 
 # plt.show()
