@@ -177,11 +177,13 @@ if __name__=="__main__":
             print("Creating Cube Mesh")
             texture_cube_mesh(path_to_data, file_name)
 
-            cube_file = f'objs/{dataset}/results/{file_name}_cube_textured'
+            cube_path = f'objs/{dataset}/results/'
+
+            cube_file = f'{file_name}_cube_textured'
 
             print("Rendering Meshes")
             render_mesh(path_to_data, file_name, dataset)
-            render_mesh(path_to_data, cube_file, dataset)
+            render_mesh(cube_file, cube_file, dataset)
 
             print("Measuring IOU")
             iou = compute_IOU(path_to_data, file_name)
