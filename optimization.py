@@ -13,7 +13,7 @@ import time
 import cma
 
 block_path = "MinecraftTextures/block/"
-resolution = 50
+resolution = 5
 metric = "w_eucl"
 filter_list = Create_Filter_List(block_path)
 
@@ -31,7 +31,7 @@ print(f"Num Blocks : ", len(block_names))
 generate(path_to_data, file_name, block_path, resolution, metric, filter_list=filter_list)
 
 # Renders Initial Pictures Of OG Image
-rendered_og = render_mesh(path_to_data, file_name, dataset, save=False)
+rendered_og = render_mesh(path_to_data, file_name, dataset, save=True)
 
 with open(f"{path_to_data}/results/voxel_to_block_{file_name}", "rb") as f:
     voxel_to_block = pickle.load(f)
