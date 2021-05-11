@@ -149,9 +149,6 @@ def Create_Filter_List(block_path):
         
 
 if __name__=="__main__":
-    print(len(glob.glob('objs/cub/*.obj')))
-    print(len(glob.glob('objs/p3d/*.obj')))
-    resolution = 50
 
     block_path = "MinecraftTextures/block/"
     resolution = 50
@@ -183,7 +180,7 @@ if __name__=="__main__":
 
             print("Rendering Meshes")
             render_mesh(path_to_data, file_name, dataset)
-            render_mesh(cube_file, cube_file, dataset)
+            render_mesh(cube_path, cube_file, dataset)
 
             print("Measuring IOU")
             iou = compute_IOU(path_to_data, file_name)
