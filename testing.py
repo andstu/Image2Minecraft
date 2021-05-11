@@ -2,13 +2,46 @@ import numpy as np
 import trimesh
 import pyrender
 import matplotlib.pyplot as plt
+from PIL import Image
+from scipy.linalg import norm
+import glob
 
 
 def compare_images(file_name, img_dir='results/'):
-    pass
+
+    norms = []
+
+    for f in glob.glob(f'{img_dir}*{file_name}.png'):
+        theta = f[len(img_dir):-(len(file_name) + 5)]
+        x = np.asarray(Image.open(f))
+        y = np.asarray(Image.open(f'{img_dir}{theta}_{file_name}_cube_textured.png'))
+        norms.append(norm(x - y))
+
+    return np.mean(norms)
+
+
 
 def compute_IOU(path_to_data, file_name):
-    pass
+    orig = trimesh.load(f'{path_to_data}{file_name}.obj')
+    cube = trimesh.load(f'{path_to_data}results/{file_name}_cube.obj')
+
+    cube.vertices /= cube.scale
+    orig.vertices /= orig.scale
+
+    cube.vertices -= cube.center_mass
+    orig.vertices -= orig.center_mass
+
+    cube.fix_normals()
+    orig.fix_normals()
+
+    cube.fill_holes()
+    orig.fill_holes()
+
+    i = cube.intersection(orig).volume
+    u = cube.union(orig).volume
+
+    return i/u
+
 
 def render_mesh(path_to_data, file_name, output_dir='results/'):
 
@@ -55,7 +88,7 @@ def render_mesh(path_to_data, file_name, output_dir='results/'):
         [ 0.0,  0.0,  0.0,  1.0]])
 
 
-        t = [0, 0, 1]
+        t = [0, 0, .85]
         # t = [1, 0, 2]
 
         f = t / np.linalg.norm(t)
@@ -83,7 +116,7 @@ def render_mesh(path_to_data, file_name, output_dir='results/'):
 
         scene.add(camera, pose=camera_pose)
 
-        light = pyrender.SpotLight(color=np.ones(3), intensity=6.0, innerConeAngle=np.pi/16.0, outerConeAngle=np.pi/6.0)
+        light = pyrender.SpotLight(color=np.ones(3), intensity=8.0, innerConeAngle=np.pi/16.0, outerConeAngle=np.pi/6.0)
         scene.add(light, pose=camera_pose)
 
         r = pyrender.OffscreenRenderer(640, 480)
@@ -93,11 +126,13 @@ def render_mesh(path_to_data, file_name, output_dir='results/'):
         plt.axis('off')
         plt.imshow(color)
 
-        plt.savefig(f'{output_dir}{file_name}_{theta_deg}.png')
+        plt.savefig(f'{output_dir}{theta_deg}_{file_name}.png')
 
 
-path_to_data = "objs/p3d/"
-file_name = "mesh_1"
-render_mesh(path_to_data, file_name)
+# path_to_data = "objs/p3d/results/"
+# file_name = "mesh_1"
+# print(compute_IOU(path_to_data, file_name))
+# render_mesh(path_to_data, file_name)
+# print(compare_images(file_name))
 
 # plt.show()
