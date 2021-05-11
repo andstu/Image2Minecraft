@@ -1,0 +1,8 @@
+newmtl mesh_11
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+d 1.0
+illum 1
+map_Ka all_mc_textures.png
+map_Kd all_mc_textures.png

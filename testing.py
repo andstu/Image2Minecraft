@@ -12,6 +12,7 @@ import os
 def compare_images(file_name, img_dir='results/'):
 
     norms = []
+    simms = []
 
     # print(f'{img_dir}*{file_name}.png')
 
@@ -19,11 +20,33 @@ def compare_images(file_name, img_dir='results/'):
         theta = f[len(img_dir):-(len(file_name) + 5)]
         x = np.asarray(Image.open(f))
         y = np.asarray(Image.open(f'{img_dir}{theta}_{file_name}_cube_textured.png'))
-        n = norm(x - y, axis=2)
-        norms.append(n.mean())
+        diff_percent = compare(x, y)
+        simms.append(1 - diff_percent)
+        # n = norm(x - y, axis=2)
+        # norms.append(n.mean())
 
-    return np.mean(norms)
+    # return np.mean(norms)
+    return np.mean(simms)
 
+def compare_images_memory(rendered_x, rendered_y):
+
+    norms = []
+    simms = []
+
+    for i in range(len(rendered_x)):
+        x = rendered_x[i]
+        y = rendered_y[i]
+
+        diff_percent = compare(x, y)
+        simms.append(1 - diff_percent)
+
+    # return np.mean(norms)
+    return np.mean(simms)
+
+
+def compare(x, y):
+    diff_percent = np.sum(np.abs(x - y)) / (255 * x.shape[0] * x.shape[1])
+    return diff_percent
 
 
 def compute_IOU(path_to_data, file_name):
@@ -48,17 +71,16 @@ def compute_IOU(path_to_data, file_name):
     return i/u
 
 
-def render_mesh(path_to_data, file_name, dataset, output_dir='results/'):
+def render_mesh(path_to_data, file_name, dataset, output_dir='results/', save=True):
 
     mesh_file = f"{path_to_data}{file_name}.obj"
-
-
 
     tmesh = trimesh.load_mesh(mesh_file)
     trimesh.repair.fix_normals(tmesh)
     tmesh.vertices /= tmesh.scale
     tmesh.vertices -= tmesh.center_mass
 
+    rendered_pics = []
         # theta = 270
     for theta_deg in range(0, 360, 45):
         theta = 2*np.pi * theta_deg / 360
@@ -126,12 +148,16 @@ def render_mesh(path_to_data, file_name, dataset, output_dir='results/'):
 
         r = pyrender.OffscreenRenderer(640, 480)
         color, depth = r.render(scene)
-        plt.figure()
-        plt.subplot(1, 1, 1)
-        plt.axis('off')
-        plt.imshow(color)
-
-        plt.savefig(f'{output_dir}{dataset}/{theta_deg}_{file_name}.png')
+        rendered_pics.append(color)
+        
+        if save:
+            plt.figure()
+            plt.subplot(1, 1, 1)
+            plt.axis('off')
+            plt.imshow(color)
+            plt.savefig(f'{output_dir}{dataset}/{theta_deg}_{file_name}.png')
+    
+    return rendered_pics
 
     
 def Create_Filter_List(block_path):
@@ -189,7 +215,7 @@ if __name__=="__main__":
             dist = compare_images(file_name, img_dir=f'results/{dataset}/')
 
             print(f'IOU: {iou}')
-            print(f'Dist: {dist}')
+            print(f'Simm: {dist}')
 
             iou_list.append(iou)
             dist_list.append(dist)

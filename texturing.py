@@ -3,10 +3,10 @@ import pickle
 import cv2
 import os
 
-def texture_cube_mesh(path_to_data, file_name, block_path="MinecraftTextures/block/", helper_path="objs/helper_data/", debug=False):
+def texture_cube_mesh(path_to_data, file_name, block_path="MinecraftTextures/block/", helper_path="objs/helper_data/", debug=False, save=True):
     obj = Get_OBJ_Data(path_to_data, f'results/{file_name}_cube')
     faces, xyz = get_voxel_mappings(obj)
-    texture, block_to_texture = Create_Block_Texture(block_path, helper_path, path_to_data, save=True) #Note, Save=True Needed to create Material once for each data_dir
+    texture, block_to_texture = Create_Block_Texture(block_path, helper_path, path_to_data, save) #Note, Save=True Needed to create Material once for each data_dir
     cubed_textured_path = Create_Textured_Mesh(file_name, block_to_texture, path_to_data, obj, xyz, helper_path=helper_path)
 
     if debug:
