@@ -1,12 +1,17 @@
 import numpy as np
 import pickle
 import cv2
+import os
 
-def texture_cube_mesh(path_to_data, file_name, block_path="MinecraftTextures/block/", helper_path="objs/helper_data/"):
+def texture_cube_mesh(path_to_data, file_name, block_path="MinecraftTextures/block/", helper_path="objs/helper_data/", debug=False):
     obj = Get_OBJ_Data(path_to_data, f'results/{file_name}_cube')
     faces, xyz = get_voxel_mappings(obj)
-    texture, block_to_texture = Create_Block_Texture(block_path, helper_path)
-    Create_Textured_Mesh(file_name, path_to_data, obj, xyz, helper_path=helper_path)
+    texture, block_to_texture = Create_Block_Texture(block_path, helper_path, path_to_data, save=True) #Note, Save=True Needed to create Material once for each data_dir
+    cubed_textured_path = Create_Textured_Mesh(file_name, block_to_texture, path_to_data, obj, xyz, helper_path=helper_path)
+
+    if debug:
+        print(f"Mesh Created : {cubed_textured_path}")
+        # TODO: plot the mesh to debug
 
 
 def get_voxel_mappings(mesh):
@@ -22,8 +27,6 @@ def get_voxel_mappings(mesh):
     xyz = midpoint.astype('int32')
 
     return faces, xyz
-
-
 
 
 def Get_OBJ_Data(path_to_data, file_name):
@@ -56,7 +59,7 @@ def Get_OBJ_Data(path_to_data, file_name):
 
     return obj
 
-def Create_Block_Texture(block_path, helper_path, load_existing=True, save=False):
+def Create_Block_Texture(block_path, helper_path, path_to_data, load_existing=False, save=False):
     if load_existing:
         with open(f"{helper_path}block_to_texture.pkl", "rb") as f:
             block_to_texture = pickle.load(f)
@@ -74,7 +77,8 @@ def Create_Block_Texture(block_path, helper_path, load_existing=True, save=False
     # Maps Block to Texture UV Coord
     block_to_texture = {}
 
-    step_size = 1 / texture_width
+    cur_coord = 0
+    step_size = 1 / MAX_NUM_MINECRAFT_TEXTURES
     y = 0
     for file in os.listdir(block_path):
         if not file.endswith(".png"):
@@ -88,16 +92,18 @@ def Create_Block_Texture(block_path, helper_path, load_existing=True, save=False
         texture[cur_coord:cur_coord + texture_width,:] = image
 
         y += step_size
+        cur_coord += texture_width
 
     if save:
         with open("block_to_texture.pkl", "wb") as f:
             pickle.dump(f"{helper_path}block_to_texture", f)
 
-        cv2.imsave(f"{helper_path}all_mc_textures.png", texture)
+        cv2.imwrite(f"{helper_path}all_mc_textures.png", texture)
+        cv2.imwrite(f"{path_to_data}results/all_mc_textures.png", texture)
 
     return texture, block_to_texture
 
-def Create_Textured_Mesh(file_name, path_to_data, obj, xyz, helper_path):
+def Create_Textured_Mesh(file_name, block_to_texture, path_to_data, obj, xyz, helper_path):
     # Loads Voxel to Block Dictionary
     with open(f"{path_to_data}results/voxel_to_block_{file_name}", "rb") as f:
         voxel_to_block = pickle.load(f)
@@ -126,13 +132,15 @@ def Create_Textured_Mesh(file_name, path_to_data, obj, xyz, helper_path):
             ft_idx += 1
         
         face_lines.append(line)
+
+    cubed_textured_path = f"{path_to_data}/results/{file_name}_cube_textured"
     
     # Write Material
-    with open(f"{file_name}.mtl", "w") as f:
+    with open(f"{cubed_textured_path}.mtl", "w") as f:
         f.write(mtl_text)
 
     # Write to Output
-    with open(f"{output_name}.obj", "w") as f:
+    with open(f"{cubed_textured_path}.obj", "w") as f:
         contents = "mtllib mesh_1.mtl\n"
         contents += "\n".join(["v " + x for x in map(lambda v: " ".join([str(y) for y in v]), obj["v"])])
         contents += "\n"
@@ -142,6 +150,4 @@ def Create_Textured_Mesh(file_name, path_to_data, obj, xyz, helper_path):
         contents += "\n".join(face_lines)
         f.write(contents)
 
-path_to_data = "objs/p3d/"
-file_name = "mesh_1"
-texture_cube_mesh(path_to_data, file_name)
+    return f"{cubed_textured_path}.obj"
