@@ -1,7 +1,7 @@
 import numpy as np
 
 def texture_cube_mesh(path_to_data, file_name, resolution):
-    obj = Get_OBJ_Data('objs/p3d/results/', 'mesh_1_cube')
+    obj = Get_OBJ_Data(path_to_data, file_name)
     faces, xyz = get_voxel_mappings(obj)
 
 
