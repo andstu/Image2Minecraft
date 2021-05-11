@@ -12,12 +12,14 @@ def compute_IOU(path_to_data, file_name):
 
 def render_mesh(path_to_data, file_name, output_dir='results/'):
 
-    mesh_file = "objs/cub/mesh_1.obj"
+    mesh_file = f"{path_to_data}{file_name}.obj"
 
 
 
     tmesh = trimesh.load_mesh(mesh_file)
     trimesh.repair.fix_normals(tmesh)
+    tmesh.vertices /= tmesh.scale
+    tmesh.vertices -= tmesh.center_mass
 
         # theta = 270
     for theta_deg in range(0, 360, 45):
@@ -53,7 +55,7 @@ def render_mesh(path_to_data, file_name, output_dir='results/'):
         [ 0.0,  0.0,  0.0,  1.0]])
 
 
-        t = [0, 0, 2.5]
+        t = [0, 0, 1]
         # t = [1, 0, 2]
 
         f = t / np.linalg.norm(t)
@@ -81,7 +83,7 @@ def render_mesh(path_to_data, file_name, output_dir='results/'):
 
         scene.add(camera, pose=camera_pose)
 
-        light = pyrender.SpotLight(color=np.ones(3), intensity=13.0, innerConeAngle=np.pi/16.0, outerConeAngle=np.pi/6.0)
+        light = pyrender.SpotLight(color=np.ones(3), intensity=6.0, innerConeAngle=np.pi/16.0, outerConeAngle=np.pi/6.0)
         scene.add(light, pose=camera_pose)
 
         r = pyrender.OffscreenRenderer(640, 480)
@@ -91,6 +93,11 @@ def render_mesh(path_to_data, file_name, output_dir='results/'):
         plt.axis('off')
         plt.imshow(color)
 
-        plt.savefig(f'test_imgs/{theta_deg}.png')
+        plt.savefig(f'{output_dir}{file_name}_{theta_deg}.png')
+
+
+path_to_data = "objs/p3d/"
+file_name = "mesh_1"
+render_mesh(path_to_data, file_name)
 
 # plt.show()
