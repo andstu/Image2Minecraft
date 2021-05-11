@@ -3,7 +3,7 @@ import pickle
 import cv2
 
 def texture_cube_mesh(path_to_data, file_name, block_path="MinecraftTextures/block/", helper_path="objs/helper_data/"):
-    obj = Get_OBJ_Data(path_to_data, file_name)
+    obj = Get_OBJ_Data(path_to_data, f'results/{file_name}_cube')
     faces, xyz = get_voxel_mappings(obj)
     texture, block_to_texture = Create_Block_Texture(block_path, helper_path)
     Create_Textured_Mesh(file_name, path_to_data, obj, xyz, helper_path=helper_path)
@@ -12,6 +12,7 @@ def texture_cube_mesh(path_to_data, file_name, block_path="MinecraftTextures/blo
 def get_voxel_mappings(mesh):
 
     faces = np.round(mesh['v'][(mesh['f'] - 1)[:]])
+
     v1 = faces[:, 1] - faces[:, 0]
     v2 = faces[:, 2] - faces[:, 0]
 
