@@ -7,7 +7,7 @@ from sklearn.neighbors import NearestNeighbors
 import os
 import torch
 from kaolin.ops.conversions import trianglemeshes_to_voxelgrids, voxelgrids_to_cubic_meshes
-import meshplot as mp
+# import meshplot as mp
 
 # Relevant Code Here Taken From 
 # https://stackoverflow.com/questions/11851342/in-python-how-do-i-voxelize-a-3d-mesh 
@@ -257,17 +257,32 @@ def generate(path_to_data, file_name, block_path, resolution, metric, filter_lis
     c_v, c_f = voxelgrids_to_cubic_meshes(torch.from_numpy(cube_world).unsqueeze(dim=0))
 
     # Saves Data
+    print("Saving Data")
     with open(f"{path_to_data}/results/voxel_to_block_{file_name}", "wb") as f:
         pickle.dump(voxel_to_block, f)
 
     with open(f'{path_to_data}/results/cube_world_{file_name}.npy', 'wb') as f:
         np.save(f, cube_world)
 
-    with open(f'{path_to_data}/results/cube_world_{file_name}_v.npy', 'wb') as f:
-        np.save(f, c_v[0].cpu().numpy())
 
-    with open(f'{path_to_data}/results/cube_world_{file_name}_f.npy', 'wb') as f:
-        np.save(f, c_f[0].cpu().numpy())
+    # Saves the cubeworld as a Mesh
+    new_v = list(c_v[0].tolist())
+    new_f = list(c_f[0].tolist())
+
+    with open("troll.obj", "w") as f:
+        contents = ""
+        contents += "\n".join(["v " + x for x in map(lambda v: " ".join([str(y) for y in v]), new_v)])
+        contents += "\n"
+        contents += "\n".join(["f " + x for x in map(lambda f: " ".join([str(y + 1) for y in f]), new_f)])
+        contents += "\n"
+        f.write(contents)
+ 
+
+    # with open(f'{path_to_data}/results/cube_world_{file_name}_v.npy', 'wb') as f:
+    #     np.save(f, c_v[0].cpu().numpy())
+
+    # with open(f'{path_to_data}/results/cube_world_{file_name}_f.npy', 'wb') as f:
+    #     np.save(f, c_f[0].cpu().numpy())
     
 
 # # Arguments
