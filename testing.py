@@ -38,7 +38,7 @@ def compare_images_memory(rendered_x, rendered_y, metric = None):
         y = rendered_y[i]
 
         score = compare(x, y)
-        scores.append(1 - score)
+        scores.append(score)
 
     # return np.mean(norms)
     return np.mean(scores)

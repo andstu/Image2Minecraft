@@ -13,7 +13,7 @@ import time
 import cma
 
 block_path = "MinecraftTextures/block/"
-resolution = 5
+resolution = 25
 metric = "w_eucl"
 filter_list = Create_Filter_List(block_path)
 
