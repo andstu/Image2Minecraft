@@ -1,8 +1,12 @@
 import numpy as np
+import pickle
+import cv2
 
-def texture_cube_mesh(path_to_data, file_name, resolution):
+def texture_cube_mesh(path_to_data, file_name, block_path="MinecraftTextures/block/", helper_path="objs/helper_data/"):
     obj = Get_OBJ_Data(path_to_data, file_name)
     faces, xyz = get_voxel_mappings(obj)
+    texture, block_to_texture = Create_Block_Texture(block_path, helper_path)
+    Create_Textured_Mesh(file_name, path_to_data, obj, xyz, helper_path=helper_path)
 
 
 def get_voxel_mappings(mesh):
@@ -25,7 +29,8 @@ def Get_OBJ_Data(path_to_data, file_name):
     # Dictionary storing OBJ data
     obj = {
     "v": [],
-    "f": []
+    "f": [],
+    "vt": []
     }
 
     # Parses and reads OBJ
@@ -50,3 +55,92 @@ def Get_OBJ_Data(path_to_data, file_name):
 
     return obj
 
+def Create_Block_Texture(block_path, helper_path, load_existing=True, save=False):
+    if load_existing:
+        with open(f"{helper_path}block_to_texture.pkl", "rb") as f:
+            block_to_texture = pickle.load(f)
+
+        texture = cv2.imread(f"{helper_path}all_mc_textures.png")
+
+        return texture, block_to_texture
+
+    MAX_NUM_MINECRAFT_TEXTURES = len(list(os.listdir(block_path)))
+    texture_width = 16
+
+    # All_MC_Blocks_Texture
+    texture = np.zeros((MAX_NUM_MINECRAFT_TEXTURES * texture_width, texture_width, 3))
+
+    # Maps Block to Texture UV Coord
+    block_to_texture = {}
+
+    step_size = 1 / texture_width
+    y = 0
+    for file in os.listdir(block_path):
+        if not file.endswith(".png"):
+            continue
+        
+        # Temp Hard Code Of Top Right Triangle
+        block_to_texture[file] = [[0, 1 - y], [1, 1 - y], [1, 1 - (y + step_size)]]
+        
+        # Sets Part of Image to MC Block
+        image = cv2.imread(f"{block_path}{file}")
+        texture[cur_coord:cur_coord + texture_width,:] = image
+
+        y += step_size
+
+    if save:
+        with open("block_to_texture.pkl", "wb") as f:
+            pickle.dump(f"{helper_path}block_to_texture", f)
+
+        cv2.imsave(f"{helper_path}all_mc_textures.png", texture)
+
+    return texture, block_to_texture
+
+def Create_Textured_Mesh(file_name, path_to_data, obj, xyz, helper_path):
+    # Loads Voxel to Block Dictionary
+    with open(f"{path_to_data}results/voxel_to_block_{file_name}", "rb") as f:
+        voxel_to_block = pickle.load(f)
+
+    # Reader Helper Data
+    with open(f"{helper_path}FORMAT.mtl", "r") as f:
+        mtl_text = f.read().replace("MESH", file_name)
+
+    # Lines List Containing Text For OBJ
+    vt_lines = []
+    face_lines = []
+
+    ft_idx = 1
+    for f, voxel in zip(obj["f"], xyz):
+        # From Voxel, Get Its Respective Block
+        block = voxel_to_block[tuple(voxel)]
+        
+        # Appends Vt data
+        vt = block_to_texture[block]
+        vt_lines.append("\n".join(["vt " + x for x in map(lambda v: " ".join([str(y) for y in v]), vt)]))
+    
+        # Append Face Data
+        line = "f "
+        for i in range(3):
+            line += f"{f[i]}/{ft_idx} "
+            ft_idx += 1
+        
+        face_lines.append(line)
+    
+    # Write Material
+    with open(f"{file_name}.mtl", "w") as f:
+        f.write(mtl_text)
+
+    # Write to Output
+    with open(f"{output_name}.obj", "w") as f:
+        contents = "mtllib mesh_1.mtl\n"
+        contents += "\n".join(["v " + x for x in map(lambda v: " ".join([str(y) for y in v]), obj["v"])])
+        contents += "\n"
+        contents += "\n".join(vt_lines)
+        contents += "\n"
+        contents += "usemtl mesh_1" + "\n"
+        contents += "\n".join(face_lines)
+        f.write(contents)
+
+path_to_data = "objs/p3d/"
+file_name = "mesh_1"
+texture_cube_mesh(path_to_data, file_name)
