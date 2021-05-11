@@ -55,9 +55,10 @@ def bb_fun(block_weights):
     # Compute Optimization Metric
     texture_cube_mesh(path_to_data, file_name, save=True)
     rendered_cm = render_mesh(cube_path, cube_file, dataset, save=True)
-    dist = compare_images_memory(rendered_og, rendered_cm)
-    print("Simm: ", dist)
-    return dist
+    score = compare_images_memory(rendered_og, rendered_cm)
+    print("Score: ", score)
+    
+    return - score
     
 # From https://github.com/paulknysh/blackbox
 

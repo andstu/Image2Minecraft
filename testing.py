@@ -28,25 +28,31 @@ def compare_images(file_name, img_dir='results/'):
     # return np.mean(norms)
     return np.mean(simms)
 
-def compare_images_memory(rendered_x, rendered_y):
+def compare_images_memory(rendered_x, rendered_y, metric = None):
 
     norms = []
-    simms = []
+    scores = []
 
     for i in range(len(rendered_x)):
         x = rendered_x[i]
         y = rendered_y[i]
 
-        diff_percent = compare(x, y)
-        simms.append(1 - diff_percent)
+        score = compare(x, y)
+        scores.append(1 - score)
 
     # return np.mean(norms)
-    return np.mean(simms)
+    return np.mean(scores)
 
 
-def compare(x, y):
-    diff_percent = np.sum(np.abs(x - y)) / (255 * x.shape[0] * x.shape[1])
-    return diff_percent
+def compare(x, y, metric=None):
+    score = 0
+    
+    if metric == None:
+        score = 1 - np.sum(np.abs(x - y)) / (255 * x.shape[0] * x.shape[1])
+    elif metric == "eucl":
+        score = norm(x - y, axis=2).mean()
+
+    return score
 
 
 def compute_IOU(path_to_data, file_name):
@@ -156,6 +162,7 @@ def render_mesh(path_to_data, file_name, dataset, output_dir='results/', save=Tr
             plt.axis('off')
             plt.imshow(color)
             plt.savefig(f'{output_dir}{dataset}/{theta_deg}_{file_name}.png')
+            plt.close()
     
     return rendered_pics
 

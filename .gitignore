@@ -3,3 +3,8 @@ output/
 .ipynb_checkpoints
 *__pycache__*
 .vscode
+results/cub/*
+results/p3d/*
+objs/cub/results/*
+objs/p3d/results/*
+outcmaes
