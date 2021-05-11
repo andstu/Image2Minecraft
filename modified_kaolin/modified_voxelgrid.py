@@ -90,7 +90,6 @@ def voxelgrids_to_cubic_meshes(voxelgrids, is_trimesh=True):
                 [6, 4, 2],
                 [5, 7, 1]])
     """
-    print("ANDSTU IS FUNNY")
     device = voxelgrids.device
     voxelgrids = voxelgrids.unsqueeze(1)
     batch_size = voxelgrids.shape[0]
