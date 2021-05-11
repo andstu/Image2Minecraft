@@ -141,7 +141,7 @@ def Create_Textured_Mesh(file_name, block_to_texture, path_to_data, obj, xyz, he
 
     # Write to Output
     with open(f"{cubed_textured_path}.obj", "w") as f:
-        contents = f"mtllib {file_name}.mtl\n"
+        contents = f"mtllib {file_name}_cube_textured.mtl\n"
         contents += "\n".join(["v " + x for x in map(lambda v: " ".join([str(y) for y in v]), obj["v"])])
         contents += "\n"
         contents += "\n".join(vt_lines)
