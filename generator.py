@@ -6,8 +6,9 @@ import pickle
 from sklearn.neighbors import NearestNeighbors
 import os
 import torch
-from kaolin.ops.conversions import trianglemeshes_to_voxelgrids, voxelgrids_to_cubic_meshes
+# from kaolin.ops.conversions import trianglemeshes_to_voxelgrids, voxelgrids_to_cubic_meshes
 # import meshplot as mp
+from modified_kaolin.modified_voxelgrid import voxelgrids_to_cubic_meshes
 
 # Relevant Code Here Taken From 
 # https://stackoverflow.com/questions/11851342/in-python-how-do-i-voxelize-a-3d-mesh 
