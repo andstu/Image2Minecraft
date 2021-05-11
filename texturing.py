@@ -3,11 +3,15 @@ import pickle
 import cv2
 import os
 
-def texture_cube_mesh(path_to_data, file_name, block_path="MinecraftTextures/block/", helper_path="objs/helper_data/"):
+def texture_cube_mesh(path_to_data, file_name, block_path="MinecraftTextures/block/", helper_path="objs/helper_data/", debug=False):
     obj = Get_OBJ_Data(path_to_data, f'results/{file_name}_cube')
     faces, xyz = get_voxel_mappings(obj)
     texture, block_to_texture = Create_Block_Texture(block_path, helper_path, path_to_data, save=True) #Note, Save=True Needed to create Material once for each data_dir
-    Create_Textured_Mesh(file_name, block_to_texture, path_to_data, obj, xyz, helper_path=helper_path)
+    cubed_textured_path = Create_Textured_Mesh(file_name, block_to_texture, path_to_data, obj, xyz, helper_path=helper_path)
+
+    if debug:
+        print(f"Mesh Created : {cubed_textured_path}")
+        # TODO: plot the mesh to debug
 
 
 def get_voxel_mappings(mesh):
@@ -23,8 +27,6 @@ def get_voxel_mappings(mesh):
     xyz = midpoint.astype('int32')
 
     return faces, xyz
-
-
 
 
 def Get_OBJ_Data(path_to_data, file_name):
@@ -130,13 +132,15 @@ def Create_Textured_Mesh(file_name, block_to_texture, path_to_data, obj, xyz, he
             ft_idx += 1
         
         face_lines.append(line)
+
+    cubed_textured_path = f"{path_to_data}/results/{file_name}_cube_textured"
     
     # Write Material
-    with open(f"{path_to_data}/results/{file_name}_cube_textured.mtl", "w") as f:
+    with open(f"{cubed_textured_path}.mtl", "w") as f:
         f.write(mtl_text)
 
     # Write to Output
-    with open(f"{path_to_data}/results/{file_name}_cube_textured.obj", "w") as f:
+    with open(f"{cubed_textured_path}.obj", "w") as f:
         contents = "mtllib mesh_1.mtl\n"
         contents += "\n".join(["v " + x for x in map(lambda v: " ".join([str(y) for y in v]), obj["v"])])
         contents += "\n"
@@ -146,6 +150,4 @@ def Create_Textured_Mesh(file_name, block_to_texture, path_to_data, obj, xyz, he
         contents += "\n".join(face_lines)
         f.write(contents)
 
-path_to_data = "objs/p3d/"
-file_name = "mesh_1"
-texture_cube_mesh(path_to_data, file_name)
+    return f"{cubed_textured_path}.obj"

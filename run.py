@@ -1,6 +1,7 @@
 from generator import generate
 from runpyanvil import generate_in_world
 import os
+from texturing import texture_cube_mesh
 
 def Create_Filter_List(block_path):
     filter_list = []
@@ -22,7 +23,7 @@ if __name__=="__main__":
     path_to_data = f"objs/{dataset}/"
     file_name = 'mesh_1' # Assumes mtl and png have the same name
     block_path = "MinecraftTextures/block/"
-    resolution = 50
+    resolution = 10
     metric = "w_eucl"
     filter_list = Create_Filter_List(block_path)
     world_name = "JoeMama"
@@ -33,7 +34,13 @@ if __name__=="__main__":
     
 
     # Generates Cube_World and Texture Mappings
+    print("Extracting Mesh Data")
     generate(path_to_data, file_name, block_path, resolution, metric, filter_list=filter_list)
     
     # Creates Minecraft Save 
+    print("Generating Minecraft Map")
     # generate_in_world(world_name, save_path, f'{path_to_data}results/cube_world_{file_name}.npy', block_types=f'{path_to_data}results/voxel_to_block_{file_name}',offset_pos=offset_pos)
+
+    # Creates the Cube Mesh
+    print("Creating Cube Mesh")
+    texture_cube_mesh(path_to_data, file_name)
