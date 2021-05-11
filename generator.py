@@ -267,7 +267,7 @@ def generate(path_to_data, file_name, block_path, resolution, metric, filter_lis
 
 
     # Saves the cubeworld as a Mesh
-    new_v = list((c_v[0] / resolution -1).tolist())
+    new_v = list((c_v[0] / (resolution -1)).tolist())
     new_f = list(c_f[0].tolist())
 
     with open(f"{path_to_data}/results/{file_name}_cube.obj", "w") as f:
