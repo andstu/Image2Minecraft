@@ -24,13 +24,15 @@ In order to generate the meshes from 2D images please refer to the instructions 
 Andrew Teeter:
 - Implemented the testing.py script
 - Implemented lines 1 - 60 in texturing.py
-- Implemented lines 236 - 280 in generator.py 
+- Implemented lines 236 - 280 in generator.py
+- Created the notebooks: KaolinTesting.ipynb, Texturing.ipynb, trimesh.ipynb
 
 Matthew Clinton:
 - Implemented optimize.py
 - Implemented lines 1 - 236 in generator.py
 - Implemented lines 60 - 153 in texturing.py
 - Implemented run.py
+- Created the notebooks: Open3D.pynb, Pytorch3D.ipynb
 
 Gregory Smelkov:
 - Forked PyAnvilEditor and fixed a bug that would crash it when blocks are added to sections without blocks
